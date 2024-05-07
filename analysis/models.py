@@ -5,6 +5,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import RandomizedSearchCV, ParameterGrid
 
 def load_data():
     X_train = pd.read_csv('.../preprocessed_X_train.csv')
@@ -23,6 +24,38 @@ def load_data():
 
     return X_train, X_test, y_train.values.ravel(), y_test.values.ravel()
 
+def findOptimalParams(model, x_train, y_train, modelType):
+    modelGrid = {
+        "randomForest": 
+            {
+                'n_estimators': [10, 50, 100],
+                'max_depth': [None, 5, 10, 20],
+                'min_samples_split': [2, 5, 10],
+                'min_samples_leaf': [1, 2, 4],
+                'max_features': [None, 'sqrt', 'log2']
+            },
+        "xgboost":
+            {
+                'booster': ['gbtree', 'gblinear', 'dart'],
+                'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
+                'min_split_loss': [0, 10, 100, 1000],
+                'max_depth': [4, 6, 8, 10],
+                'scale_pos_weight': [0.2, 0.25, 0.5, 0.8, 1]
+            }
+    }
+    
+    if modelType not in modelGrid.keys():
+        raise Exception("not a valid model")
+    
+    modelGrid = modelGrid[modelType]
+    
+    optimalParam = RandomizedSearchCV(model, modelGrid, cv=5, n_jobs=-1, n_iter=int(0.33 * len(list(ParameterGrid(modelGrid)))))
+    optimalParam.fit(x_train, y_train)
+    
+    model.set_params(optimalParam)
+    
+    return model
+    
 # Apply SMOTE to balance the dataset
 def balance_data(X_train, y_train):
     smote = SMOTE(random_state=42)
