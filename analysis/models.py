@@ -12,8 +12,8 @@ def load_data():
     y_train = pd.read_csv('.../preprocessed_y_train.csv')
     y_test = pd.read_csv('.../preprocessed_y_test.csv')
     print(y_train['loan_approved'].value_counts())
-    # clean column names to be compatible with XGBoost
 
+    # clean column names to be compatible with XGBoost
     columns_to_drop = ['interest_rate', 'rate_spread', 'origination_charges', 'total_loan_costs']
     X_train = X_train.drop(columns=columns_to_drop, axis=1)
     X_test = X_test.drop(columns=columns_to_drop, axis=1)
