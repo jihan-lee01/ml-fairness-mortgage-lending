@@ -26,7 +26,7 @@ def load_data():
 
 def findOptimalParams(model, x_train, y_train, modelType):
     modelGrid = {
-        "randomForest": 
+        "rf": 
             {
                 'n_estimators': [10, 50, 100],
                 'max_depth': [None, 5, 10, 20],
@@ -34,7 +34,7 @@ def findOptimalParams(model, x_train, y_train, modelType):
                 'min_samples_leaf': [1, 2, 4],
                 'max_features': [None, 'sqrt', 'log2']
             },
-        "xgboost":
+        "xgb":
             {
                 'booster': ['gbtree', 'gblinear', 'dart'],
                 'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
@@ -51,6 +51,8 @@ def findOptimalParams(model, x_train, y_train, modelType):
     
     optimalParam = RandomizedSearchCV(model, modelGrid, cv=5, n_jobs=-1, n_iter=int(0.33 * len(list(ParameterGrid(modelGrid)))))
     optimalParam.fit(x_train, y_train)
+    optimalParam = optimalParam.get_params()
+    print(optimalParam)
     
     model.set_params(optimalParam)
     
@@ -66,8 +68,10 @@ def balance_data(X_train, y_train):
 def train_model(X_train, y_train, model_type='rf'):
     if model_type == 'rf':
         model = RandomForestClassifier(random_state=42)
+        model = findOptimalParams(model, X_train, y_train, model_type)
     elif model_type == 'xgb':
         model = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+        model = findOptimalParams(model, X_train, y_train, model_type)
     model.fit(X_train, y_train)
     return model
 
