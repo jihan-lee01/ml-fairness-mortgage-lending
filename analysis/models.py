@@ -2,10 +2,12 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_curve
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import RandomizedSearchCV, ParameterGrid
+import seaborn as sns
+
 
 def load_data():
     X_train = pd.read_csv('data/preprocessed_X_train.csv')
@@ -86,7 +88,11 @@ def evaluate_model(model, X_test, y_test):
     print(f'Accuracy: {accuracy}')
     print(f'Precision (Approved): {precision[0]}, Precision (Denied): {precision[1]}')
     print(f'Recall (Approved): {recall[0]}, Recall (Denied): {recall[1]}')
-    return y_pred
+    
+    yProb = [x[1] for x in model.predict_proba(X_test)]
+    fpr, tpr, thresholds = roc_curve(y_test, yProb)
+    data = {'tpr': tpr, 'fpr': fpr}
+    return y_pred, data
 
 # Plot feature importance and print top 20 features
 def plot_feature_importance(model, X_train, model_type='rf'):
@@ -102,22 +108,48 @@ def plot_feature_importance(model, X_train, model_type='rf'):
     # print("Top 20 Feature Importances:")
     # for i in indices:
     #     print(f"{X_train.columns[i]}: {importances[i]}")
+    
+def plot_ROC(data):
+    totaldf = None
+    for model in data:
+        tpr = data[model]['tpr']
+        fpr = data[model]['fpr']
+    
+        df = pd.DataFrame({'tpr': tpr, 'fpr': fpr, 'model': model})
+        
+        if totaldf is None:
+            totaldf = df
+        else:
+            totaldf = pd.concat([totaldf, df])
+        
+
+    lines = sns.lineplot(data = totaldf, x='fpr', y='tpr', hue='model')
+    lines.set_title('ROC Curve')
+    lines.set_xlabel('FPR')
+    lines.set_ylabel('TPR')
+    lines.set_xlim([0, 1])
+    lines.set_ylim([0, 1])
+    plt.show()
+
 
 def main():
     X_train, X_test, y_train, y_test = load_data()
     X_train_balanced, y_train_balanced = balance_data(X_train, y_train)  # Balance the dataset with SMOTE
 
+    bigData = {}
     # Random Forest
-    # print("Random Forest Results:")
-    # rf_model = train_model(X_train_balanced, y_train_balanced, model_type='rf')
-    # evaluate_model(rf_model, X_test, y_test)
+    print("Random Forest Results:")
+    rf_model = train_model(X_train_balanced, y_train_balanced, model_type='rf')
+    y_pred, data = evaluate_model(rf_model, X_test, y_test)
     # plot_feature_importance(rf_model, X_train, model_type='rf')
-
+    bigData["Random Forest"] = data
     # XGBoost
     print("XGBoost Results:")
     xgb_model = train_model(X_train_balanced, y_train_balanced, model_type='xgb')
-    evaluate_model(xgb_model, X_test, y_test)
-    plot_feature_importance(xgb_model, X_train_balanced, model_type='xgb')
-
+    y_pred, data = evaluate_model(xgb_model, X_test, y_test)
+    # plot_feature_importance(xgb_model, X_train_balanced, model_type='xgb')
+    bigData["XGBoost"] = data
+    
+    plot_ROC(bigData)
 if __name__ == "__main__":
     main()
