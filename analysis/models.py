@@ -8,10 +8,10 @@ from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import RandomizedSearchCV, ParameterGrid
 
 def load_data():
-    X_train = pd.read_csv('.../preprocessed_X_train.csv')
-    X_test = pd.read_csv('.../preprocessed_X_test.csv')
-    y_train = pd.read_csv('.../preprocessed_y_train.csv')
-    y_test = pd.read_csv('.../preprocessed_y_test.csv')
+    X_train = pd.read_csv('data/preprocessed_X_train.csv')
+    X_test = pd.read_csv('data/preprocessed_X_test.csv')
+    y_train = pd.read_csv('data/preprocessed_y_train.csv')
+    y_test = pd.read_csv('data/preprocessed_y_test.csv')
     print(y_train['loan_approved'].value_counts())
 
     # clean column names to be compatible with XGBoost
@@ -36,11 +36,11 @@ def findOptimalParams(model, x_train, y_train, modelType):
             },
         "xgb":
             {
-                'booster': ['gbtree', 'gblinear', 'dart'],
-                'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
+                'booster': ['gbtree', 'dart'],
+                'learning_rate': [0.1, 0.3, 0.5],
                 'min_split_loss': [0, 10, 100, 1000],
                 'max_depth': [4, 6, 8, 10],
-                'scale_pos_weight': [0.2, 0.25, 0.5, 0.8, 1]
+                'scale_pos_weight': [0.25, 0.5, 0.8, 1]
             }
     }
     
@@ -51,10 +51,10 @@ def findOptimalParams(model, x_train, y_train, modelType):
     
     optimalParam = RandomizedSearchCV(model, modelGrid, cv=5, n_jobs=-1, n_iter=int(0.33 * len(list(ParameterGrid(modelGrid)))))
     optimalParam.fit(x_train, y_train)
-    optimalParam = optimalParam.get_params()
+    optimalParam = optimalParam.best_params_
     print(optimalParam)
     
-    model.set_params(optimalParam)
+    model.set_params(**optimalParam)
     
     return model
     
@@ -67,11 +67,13 @@ def balance_data(X_train, y_train):
 # Train model
 def train_model(X_train, y_train, model_type='rf'):
     if model_type == 'rf':
+        rf_optimal = {'n_estimators': 100, 'min_samples_split': 2, 'min_samples_leaf': 1, 'max_features': 'log2', 'max_depth': None}
         model = RandomForestClassifier(random_state=42)
-        model = findOptimalParams(model, X_train, y_train, model_type)
+        model.set_params(**rf_optimal)
     elif model_type == 'xgb':
+        xgb_optimal = {'scale_pos_weight': 1, 'min_split_loss': 0, 'max_depth': 8, 'learning_rate': 0.5, 'booster': 'dart'}
         model = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
-        model = findOptimalParams(model, X_train, y_train, model_type)
+        model.set_params(**xgb_optimal)
     model.fit(X_train, y_train)
     return model
 
@@ -106,10 +108,10 @@ def main():
     X_train_balanced, y_train_balanced = balance_data(X_train, y_train)  # Balance the dataset with SMOTE
 
     # Random Forest
-    print("Random Forest Results:")
-    rf_model = train_model(X_train_balanced, y_train_balanced, model_type='rf')
-    evaluate_model(rf_model, X_test, y_test)
-    plot_feature_importance(rf_model, X_train, model_type='rf')
+    # print("Random Forest Results:")
+    # rf_model = train_model(X_train_balanced, y_train_balanced, model_type='rf')
+    # evaluate_model(rf_model, X_test, y_test)
+    # plot_feature_importance(rf_model, X_train, model_type='rf')
 
     # XGBoost
     print("XGBoost Results:")
