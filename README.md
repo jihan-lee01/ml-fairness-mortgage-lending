@@ -1,1 +1,1 @@
-# Fairness Analysis in Mortgage Lending with Machine Learning Algorithms
+# Fairness Analysis in Mortgage Lending
