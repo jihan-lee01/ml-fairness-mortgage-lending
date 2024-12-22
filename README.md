@@ -31,6 +31,8 @@ The project leverages machine learning models like Random Forest and XGBoost, al
 ## Project Structure
 
 The directory structure is organized as follows:
+
+```bash
 analysis/
 |------ models.py
 |------ preprocessing.py
@@ -72,6 +74,7 @@ docs/
 |------ project_spotlight.pptx
 .gitignore
 README.md
+```
 
 ---
 
