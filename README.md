@@ -37,17 +37,15 @@ analysis/
 |------ models.py
 |------ preprocessing.py
 |------ random_forest.py
-|------ visualization.py
 notebooks/
 |------ models.ipynb
 |------ preprocessing_demo.ipynb
 |------ visualization.ipynb
 data/
-|------ raw/
-|       |------ X_test.csv
-|       |------ X_train.csv
-|       |------ y_test.csv
-|       |------ y_train.csv
+|------ X_test.csv
+|------ X_train.csv
+|------ y_test.csv
+|------ y_train.csv
 |------ processed/
 |       |------ preprocessed_X_test.csv
 |       |------ preprocessed_X_train.csv
@@ -55,12 +53,12 @@ data/
 |       |------ preprocessed_y_train.csv
 |       |------ sampled_preprocessed_data.csv
 graphs/
-|------ age_distribution.png
-|------ approval_rates.png
-|------ ethnicity_distribution.png
-|------ correlation_heatmap.png
-|------ race_distribution.png
-|------ sex_distribution.png
+|------ age_composition.png
+|------ approval_rate.png
+|------ ethnicity_composition.png
+|------ feature_heatmap.png
+|------ race_composition.png
+|------ sex_composition.png
 references/
 |------ Cherian_2014.pdf
 |------ Gill_et_al_2020.pdf
