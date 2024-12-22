@@ -11,9 +11,8 @@ This repository contains the source code, data, and documentation for the projec
 - [Methods](#methods)
 - [Results](#results)
 - [Fairness Evaluation](#fairness-evaluation)
-- [How to Run](#how-to-run)
-- [Contributions](#contributions)
 - [References](#references)
+- [Contact](#contact)
 
 ---
 
@@ -37,21 +36,22 @@ analysis/
 |------ models.py
 |------ preprocessing.py
 |------ random_forest.py
-notebooks/
-|------ models.ipynb
-|------ preprocessing_demo.ipynb
-|------ visualization.ipynb
 data/
-|------ X_test.csv
-|------ X_train.csv
-|------ y_test.csv
-|------ y_train.csv
 |------ processed/
 |       |------ preprocessed_X_test.csv
 |       |------ preprocessed_X_train.csv
 |       |------ preprocessed_y_test.csv
 |       |------ preprocessed_y_train.csv
 |       |------ sampled_preprocessed_data.csv
+|------ X_test.csv
+|------ X_train.csv
+|------ y_test.csv
+|------ y_train.csv
+docs/
+|------ project_proposal.pdf
+|------ project_proposal_graded.pdf
+|------ project_spotlight.pptx
+|------ report.pdf
 graphs/
 |------ age_composition.png
 |------ approval_rate.png
@@ -59,17 +59,16 @@ graphs/
 |------ feature_heatmap.png
 |------ race_composition.png
 |------ sex_composition.png
+notebooks/
+|------ models.ipynb
+|------ preprocessing_demo.ipynb
+|------ visualization.ipynb
 references/
 |------ Cherian_2014.pdf
 |------ Gill_et_al_2020.pdf
 |------ Hodges_et_al_2024.pdf
 |------ Lee_2017.pdf
 |------ Zou_et_al_2022.pdf
-docs/
-|------ project_proposal.pdf
-|------ project_proposal_graded.pdf
-|------ report.pdf
-|------ project_spotlight.pptx
 .gitignore
 README.md
 ```
